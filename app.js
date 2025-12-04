@@ -19,6 +19,8 @@ const passport=require('passport');
 const User=require('./models/user.js');
 const connectMongo = require('connect-mongo');
 const MongoStore = connectMongo.default || connectMongo; 
+const Listing = require('./models/listing.js');
+const wrapAsync = require('./utils/wrapAsync.js');
 
 
 //ejs setup
@@ -96,9 +98,10 @@ app.get('/privacy',(req,res) =>{
 app.get('/terms',(req,res) =>{
     res.render('listings/terms.ejs');
 });
-app.get('/', (req, res) => {
-    res.render('listings/index.ejs');
-});
+app.get('/', wrapAsync(async (req, res) => {
+    const listings = await Listing.find({});
+    res.render("listings/index.ejs", { listings });
+}));
 // 404 handler
 app.use((req, res, next) => {
     next(new ExpressError(404, "Page Not Found"));
