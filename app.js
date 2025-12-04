@@ -96,6 +96,9 @@ app.get('/privacy',(req,res) =>{
 app.get('/terms',(req,res) =>{
     res.render('listings/terms.ejs');
 });
+app.get('/', (req, res) => {
+    res.render('listings/index.ejs');
+});
 // 404 handler
 app.use((req, res, next) => {
     next(new ExpressError(404, "Page Not Found"));
