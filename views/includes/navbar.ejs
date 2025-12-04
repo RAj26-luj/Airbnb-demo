@@ -1,0 +1,78 @@
+<nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top" style="z-index: 1000;">
+  <div class="container-fluid">
+    
+    <!-- 1. Logo -->
+    <a class="navbar-brand" href="/listings">
+      <img src="/images/Airbnb-logol.png" alt="Airbnb Logo">
+    </a>
+
+    <!-- 2. Toggler (Mobile Menu Button) -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- 3. Search Bar -->
+    <form class="d-flex ms-md-auto me-md-3 search-container position-relative" 
+          action="/listings/search" 
+          method="GET" 
+          autocomplete="off">
+      
+      <div class="position-relative w-100">
+        <input 
+          class="form-control me-2 search-inpt"
+          type="search"
+          placeholder="Search destinations..."
+          aria-label="Search"
+          id="navbar-search"
+          name="q"
+        />
+        <!-- Suggestions dropdown -->
+        <div id="search-suggestions"
+             class="list-group position-absolute w-100"
+             style="top: 110%; left: 0; z-index: 2000; ">
+        </div>
+      </div>
+
+      <button class="btn btn-search ms-2" type="submit">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <span>Search</span>
+      </button>
+    </form>
+
+    <!-- 4. Collapsible Menu -->
+    <div class="collapse navbar-collapse flex-grow-0" id="navbarNav">
+      <ul class="navbar-nav align-items-center">
+        <li class="nav-item">
+          <a class="nav-link fw-medium" href="/listings">Explore</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/listings/new">
+             <span class="btn btn-sm btn-dark rounded-pill px-3">Become a Host</span>
+          </a>
+        </li>
+
+        <% if(!currUser) { %>
+          <li class="nav-item ms-md-2">
+            <a class="nav-link" href="/register">
+              <span class="btn btn-sm btn-outline-danger rounded-pill px-3">Sign Up</span>
+            </a>
+          </li>
+          <li class="nav-item ms-1">
+            <a class="nav-link" href="/login">
+              <span class="btn btn-sm btn-outline-secondary rounded-pill px-3">Log in</span>
+            </a>
+          </li>
+        <% } else { %>
+          <li class="nav-item ms-md-2">
+            <a class="nav-link" href="/logout">
+              <span class="btn btn-sm btn-outline-secondary rounded-pill px-3">Log Out</span>
+            </a>
+          </li>
+        <% } %>
+      </ul>
+    </div>
+    
+  </div>
+</nav>
+
+<script src="/js/search.js"></script>

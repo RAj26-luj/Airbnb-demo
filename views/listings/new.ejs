@@ -1,0 +1,151 @@
+<% layout("layouts/boilerplate") %>
+
+<div class="row mt-3">
+  <!-- Changed to col-12 for mobile, col-md-8 for tablet/desktop -->
+  <div class="col-12 col-md-8 offset-md-2">
+    <form method="POST"
+          action="/listings"
+          novalidate
+          class="needs-validation"
+          enctype="multipart/form-data">
+      <h1 class="text-center mb-4" style="color: #fe424d;">Add New Property</h1>
+
+      <!-- Title -->
+      <div class="mb-3">
+        <label class="form-label" for="title">Title:</label>
+        <input class="form-control"
+               type="text"
+               name="listing[title]"
+               id="title"
+               placeholder="Enter property title"
+               required>
+        <div class="valid-feedback">Looks good!</div>
+      </div>
+
+      <!-- Description -->
+      <div class="mb-3">
+        <label class="form-label" for="description">Description:</label>
+        <textarea class="form-control"
+                  name="listing[description]"
+                  id="description"
+                  placeholder="Describe your property"
+                  required
+                  rows="4"></textarea>
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Please provide a valid description.</div>
+      </div>
+
+      <!-- Image Upload -->
+      <div class="mb-3">
+        <label class="form-label" for="image">Image Upload</label>
+        <input class="form-control"
+               type="file"
+               name="listing[image]"
+               id="image"
+               required>
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Please upload an image of your property.</div>
+      </div>
+
+      <!-- Price + Country (Stacks on mobile, Side-by-side on desktop) -->
+      <div class="row">
+        <div class="mb-3 col-md-4">
+          <label class="form-label" for="price">Price:</label>
+          <input class="form-control"
+                 type="number"
+                 name="listing[price]"
+                 id="price"
+                 placeholder="In Rupees"
+                 required>
+          <div class="valid-feedback">Looks good!</div>
+          <div class="invalid-feedback">Please provide a valid price.</div>
+        </div>
+
+        <div class="mb-3 col-md-8">
+          <label class="form-label" for="country">Country:</label>
+          <input class="form-control"
+                 type="text"
+                 name="listing[country]"
+                 id="country"
+                 placeholder="Enter country"
+                 required>
+          <div class="valid-feedback">Looks good!</div>
+          <div class="invalid-feedback">Please provide a valid country.</div>
+        </div>
+      </div>
+
+      <!-- Category -->
+      <div class="mb-3">
+        <label class="form-label" for="category">Category:</label>
+        <select class="form-select"
+                id="category"
+                name="listing[category]"
+                required>
+          <option value="" disabled selected>Select a category</option>
+          <option value="Trending">Trending</option>
+          <option value="Rooms">Rooms</option>
+          <option value="Iconic Cities">Iconic Cities</option>
+          <option value="Hill Stations">Hill Stations</option>
+          <option value="Castles">Castles</option>
+          <option value="Amazing Pools">Amazing Pools</option>
+          <option value="Camping">Camping</option>
+          <option value="Farms">Farms</option>
+          <option value="Arctics">Arctics</option>
+          <option value="Deserts">Deserts</option>
+        </select>
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Please select a category.</div>
+      </div>
+
+      <!-- City -->
+      <div class="mb-3">
+        <label class="form-label" for="city">City:</label>
+        <div class="position-relative">
+          <input
+            class="form-control"
+            type="text"
+            name="listing[city]"
+            id="city"
+            placeholder="Enter city"
+            autocomplete="off"
+            required
+          >
+
+          <div id="city-suggestions"
+               class="list-group position-absolute w-100"
+               style="z-index: 1000;"></div>
+
+          <div class="valid-feedback">City looks valid!</div>
+          <div class="invalid-feedback" id="city-invalid-feedback">
+            Please enter a valid city for the selected country.
+          </div>
+        </div>
+      </div>
+
+      <input type="hidden" name="listing[latitude]" id="latitude">
+      <input type="hidden" name="listing[longitude]" id="longitude">
+
+      <!-- Location -->
+      <div class="mb-3">
+        <label class="form-label" for="location">Location:</label>
+        <input class="form-control"
+               type="text"
+               name="listing[location]"
+               id="location"
+               placeholder="Enter property location"
+               required>
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Please provide a valid location.</div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="mb-5">
+        <button class="btn btn-dark add-btn edit-btn w-100" type="submit">
+          <i class="fa-solid fa-plus"></i> &nbsp; Add Property
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="/js/cityvalidity.js"></script>

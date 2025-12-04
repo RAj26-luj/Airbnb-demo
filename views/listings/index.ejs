@@ -1,0 +1,139 @@
+<% layout("layouts/boilerplate") %>
+
+<!-- FILTER BAR -->
+<div id="filters">
+  
+  <!-- Scrollable categories -->
+  <div class="filters-scroll ">
+    <div class="filter " data-category="Trending">
+      <i class="fa-solid fa-fire"></i><p>Trending</p>
+    </div>
+    <div class="filter" data-category="Rooms">
+      <i class="fa-solid fa-bed"></i><p>Rooms</p>
+    </div>
+    <div class="filter" data-category="Iconic Cities">
+      <i class="fa-solid fa-mountain-city"></i><p>Iconic Cities</p>
+    </div>
+    <div class="filter" data-category="Hill Stations">
+      <i class="fa-solid fa-mountain"></i><p>Hill Stations</p>
+    </div>
+    <div class="filter" data-category="Castles">
+      <i class="fa-brands fa-fort-awesome"></i><p>Castles</p>
+    </div>
+    <div class="filter" data-category="Amazing Pools">
+      <i class="fa-solid fa-person-swimming"></i><p>Amazing Pools</p>
+    </div>
+    <div class="filter" data-category="Camping">
+      <i class="fa-solid fa-tent"></i><p>Camping</p>
+    </div>
+    <div class="filter" data-category="Farms">
+      <i class="fa-solid fa-cow"></i><p>Farms</p>
+    </div>
+    <div class="filter" data-category="Arctics">
+      <i class="fa-regular fa-snowflake"></i><p>Arctics</p>
+    </div>
+    <div class="filter" data-category="Deserts">
+      <i class="fa-solid fa-sun-plant-wilt"></i><p>Deserts</p>
+    </div>
+
+    <!-- Mobile-only Tax Toggle (Scrolls with icons) -->
+    <div class="tax-toggle tax-toggle-mobile">
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckMobile">
+        <label class="form-check-label" for="flexSwitchCheckMobile">
+          Display total before taxes
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Desktop Tax Toggle (Stays fixed on right) -->
+  <div class="tax-toggle tax-toggle-desktop">
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+      <label class="form-check-label" for="flexSwitchCheckDefault">
+        Display total before taxes
+      </label>
+    </div>
+  </div>
+
+</div>
+<div class="container mt-3">
+  <% 
+    const categories = ["Trending", "Rooms", "Iconic Cities", "Hill Stations", "Castles", "Amazing Pools", "Camping", "Farms", "Arctics", "Deserts"];
+    const groupedListings = {};
+    
+    categories.forEach(cat => groupedListings[cat] = []);
+    if (listings && listings.length) {
+      listings.forEach(listing => {
+        let cat = listing.category; 
+        if (groupedListings[cat]) {
+          groupedListings[cat].push(listing);
+        } else {
+          if (!groupedListings['Other']) groupedListings['Other'] = [];
+          groupedListings['Other'].push(listing);
+        }
+      });
+    }
+  %>
+
+  <% categories.forEach(category => { %>
+    <% if (groupedListings[category] && groupedListings[category].length > 0) { %>
+      
+      <div class="category-section">
+        <h2 class="category-title"><%= category %></h2>
+        
+        <div class="horizontal-scroll-container">
+          
+          <% groupedListings[category].forEach(listing => { %>
+            <div class="scroll-card">
+              <a class="listing-link" href="/listings/<%= listing._id %>">
+                <div class="card listing-card h-100">
+                  
+                  <div class="img-container">
+                    <i class="fa-regular fa-heart heart-icon"></i>
+                    <img src="<%= listing.image.url %>" class="card-img-top" alt="listing_image">
+                  </div>
+
+                  <div class="card-body">
+                    <p class="card-text">
+                      <span class="listing-title"><%= listing.title %></span>
+                      <span class="listing-location"><%= listing.location %>, <%= listing.country %></span><br>
+                      
+                      <div class="listing-price">
+                        <span class="fw-bold">
+                          <%= listing.price.toLocaleString("en-IN") %> &#8377;
+                        </span>
+                        <span style="font-weight:400"> / night</span>
+                        
+                        <!-- Same text style as category page -->
+                        <span class="tax-des" style="font-size: 0.8rem; color: #717171;">
+                          (excl. taxes)
+                        </span>
+                        <i class="tax-info" style="font-size: 0.8rem; color: #e51d28; font-style: normal;">
+                          &nbsp;+18% GST
+                        </i>
+                      </div>
+                    </p>
+                  </div>
+                </div>
+              </a>
+            </div>
+          <% }) %>
+
+        </div>
+      </div>
+
+    <% } %>
+  <% }) %>
+
+  <% if (!listings || listings.length === 0) { %>
+    <div class="text-center mt-5">
+      <h3>No listings available currently.</h3>
+    </div>
+  <% } %>
+
+</div>
+
+<script src="/js/index.js"></script>
+

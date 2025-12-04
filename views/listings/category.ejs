@@ -1,0 +1,120 @@
+<% layout("layouts/boilerplate") %>
+
+<!-- FILTER BAR -->
+<div id="filters">
+  <!-- Scrollable Container -->
+  <div class="filters-scroll">
+    <div class="filter" onclick="window.location.href='/listings/category/Trending'">
+      <i class="fa-solid fa-fire"></i><p style="font-size: smaller; margin:0;">Trending</p>
+    </div>
+    <div class="filter" onclick="window.location.href='/listings/category/Rooms'">
+      <i class="fa-solid fa-bed"></i><p style="font-size: smaller; margin:0;">Rooms</p>
+    </div>
+    <div class="filter" onclick="window.location.href='/listings/category/Iconic%20Cities'">
+      <i class="fa-solid fa-mountain-city"></i><p style="font-size: smaller; margin:0;">Iconic Cities</p>
+    </div>
+    <div class="filter" onclick="window.location.href='/listings/category/Hill%20Stations'">
+      <i class="fa-solid fa-mountain"></i><p style="font-size: smaller; margin:0;">Hill Stations</p>
+    </div>
+    <div class="filter" onclick="window.location.href='/listings/category/Castles'">
+      <i class="fa-brands fa-fort-awesome"></i><p style="font-size: smaller; margin:0;">Castles</p>
+    </div>
+    <div class="filter" onclick="window.location.href='/listings/category/Amazing%20Pools'">
+      <i class="fa-solid fa-person-swimming"></i><p style="font-size: smaller; margin:0;">Amazing Pools</p>
+    </div>
+    <div class="filter" onclick="window.location.href='/listings/category/Camping'">
+      <i class="fa-solid fa-tent"></i><p style="font-size: smaller; margin:0;">Camping</p>
+    </div>
+    <div class="filter" onclick="window.location.href='/listings/category/Farms'">
+      <i class="fa-solid fa-cow"></i><p style="font-size: smaller; margin:0;">Farms</p>
+    </div>
+    <div class="filter" onclick="window.location.href='/listings/category/Arctics'">
+      <i class="fa-regular fa-snowflake"></i><p style="font-size: smaller; margin:0;">Arctics</p>
+    </div>
+    <div class="filter" onclick="window.location.href='/listings/category/Deserts'">
+      <i class="fa-solid fa-sun-plant-wilt"></i><p style="font-size: smaller; margin:0;">Deserts</p>
+    </div>
+
+    <!-- Mobile-only Tax Toggle (Scrolls with icons) -->
+    <div class="tax-toggle tax-toggle-mobile">
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="taxSwitchMobile">
+        <label class="form-check-label" for="taxSwitchMobile" style="font-size: small; white-space: nowrap;">
+          Display total before taxes
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Desktop-only Tax Toggle (Moved here to match Index page) -->
+  <div class="tax-toggle tax-toggle-desktop">
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="taxSwitchCategory">
+      <label class="form-check-label" for="taxSwitchCategory" style="font-size: small; white-space: nowrap;">
+        Display total before taxes
+      </label>
+    </div>
+  </div>
+</div>
+
+
+<div class="container-fluid category-header-container px-3">
+  <div class="category-title-group">
+    <a href="/listings" class="btn back-btn">
+      <i class="fa-solid fa-arrow-left"></i> Back
+    </a>
+    <!-- Aligned to left (removed text-align: right) -->
+    <h2 style="color: #222; margin: 0; font-weight: 700;">
+      <%= category %> <span style="font-weight: 400; color: #717171;">Stays</span>
+    </h2>
+  </div>
+</div>
+
+<div class="container-fluid px-4">
+  <hr class="mt-0 mb-4">
+</div>
+
+<% if (listings.length === 0) { %>
+  <div class="container text-center mt-5">
+    <i class="fa-solid fa-magnifying-glass fa-3x text-muted mb-3"></i>
+    <h3>No listings found in <%= category %></h3>
+    <p class="text-muted">Try selecting a different category from the top bar.</p>
+  </div>
+<% } %>
+
+<div class="container-fluid px-4">
+  <div class="row row-cols-lg-3 row-cols-md-2 row-cols-1 mt-3">
+    <% for (let listing of listings) { %>
+      <div class="col mb-4">
+        <a class="listing-link" href="/listings/<%= listing._id %>">
+          <div class="card listing-card h-100">
+            
+            <!-- Wrapped in img-container for consistent sizing/aspect ratio -->
+            <div class="img-container">
+              <img src="<%= listing.image.url %>" class="card-img-top" alt="listing_image">
+              <div class="card-img-overlay"></div>
+            </div>
+
+            <div class="card-body">
+              <p class="card-text">
+                <span class="fw-bold"><%= listing.title %></span><br>
+                <span class="text-muted"><%= listing.location %>, <%= listing.country %></span><br>
+                
+                <span class="fw-bold">
+                  <%= listing.price.toLocaleString("en-IN") %> ₹
+                </span> / night 
+                
+                <span class="tax-des" style="font-size: 0.8rem; color: #717171;">(excl. taxes)</span>
+                <i class="tax-info" style="font-size: 0.8rem; color: #e51d28; font-style: normal;">&nbsp;+18% GST</i>
+              </p>
+            </div>
+          </div>
+        </a>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<script src="/js/category.js"></script>
+
+
