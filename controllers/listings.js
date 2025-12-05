@@ -1,9 +1,10 @@
 const Listing = require('../models/listing.js');
 const wrapAsync = require('../utils/wrapAsync.js');
 const ExpressError = require('../utils/ExpressError.js');
-const validateCity = require("../utils/validateCity.js");
 const { cloudinary } = require('../cloudConfig.js');
-
+const mbxGeocodind = require('@mapbox/mapbox-sdk/services/geocoding');
+const mapBoxToken = process.env.MAP_TOKEN;
+const geocodingClient = mbxGeocodind({ accessToken: mapBoxToken });
 const index = wrapAsync(async (req, res) => {
     const listings = await Listing.find({});
     res.render("listings/index.ejs", { listings });
@@ -14,51 +15,78 @@ const AddGet = (req, res) => {
 };
 
 const AddPost = wrapAsync(async (req, res) => {
-    const listingData = req.body.listing || {};
-    const { city, country } = listingData;
+  const listingData = req.body.listing || {};
+  const { city, country } = listingData;
 
-    if (city && country) {
-        const result = await validateCity(city, country);
+ 
+  if (!city || !country) {
+    req.flash("error", "City and Country are required.");
+    return res.redirect("/listings/new");
+  }
 
-        if (!result) {
-            if (req.file) {
-                const publicId = req.file.filename || req.file.public_id;
-                if (publicId) {
-                    try {
-                        await cloudinary.uploader.destroy(publicId);
-                    } catch (err) {
-                        console.error("Error deleting Cloudinary image on invalid city:", err);
-                    }
-                }
-            }
 
-            req.flash('error', 'Invalid city! Please enter a valid city that exists in the given country.');
-            return res.redirect('/listings/new');
-        }
+  try {
+    const geoResponse = await geocodingClient
+      .forwardGeocode({
+        query: `${city}, ${country}`,
+        limit: 1,
+      })
+      .send();
 
-        listingData.city = result.normalizedCity;
-        listingData.latitude = parseFloat(result.latitude);
-        listingData.longitude = parseFloat(result.longitude);
+    const features = geoResponse.body.features || [];
+    const feature = features[0];
+
+    if (!feature || !Array.isArray(feature.center)) {
+      req.flash("error", "Could not find coordinates for this location. Please enter a valid city.");
+      return res.redirect("/listings/new");
     }
 
+    const [lon, lat] = feature.center;
+
+   
+    listingData.latitude = lat;
+    listingData.longitude = lon;
+
+   
+    if (feature.text) {
+      listingData.city = feature.text;
+    }
+
+  } catch (err) {
+    console.error("Mapbox Geocoding Error:", err.message);
+    req.flash("error", "Geocoding service failed. Try again later.");
+    return res.redirect("/listings/new");
+  }
+
+ 
+  try {
     const newListing = new Listing(listingData);
     newListing.owner = req.user._id;
 
+  
     if (req.file) {
-        newListing.image = {
-            url: req.file.secure_url || req.file.path || req.file.url,
-            filename: req.file.filename || req.file.public_id,
-        };
+      newListing.image = {
+        url: req.file.secure_url || req.file.path || req.file.url,
+        filename: req.file.filename || req.file.public_id,
+      };
     } else {
-        newListing.image = {
-            url: "/images/flat-hotel-review-background_23-2148158366.avif",
-            filename: "default-image",
-        };
+      newListing.image = {
+        url: "/images/flat-hotel-review-background_23-2148158366.avif",
+        filename: "default-image",
+      };
     }
 
     await newListing.save();
-    req.flash('success', 'Property added Successfully!');
-    res.redirect("/listings");
+
+    
+    req.flash("success", "Property added Successfully!");
+    return res.redirect("/listings");
+
+  } catch (err) {
+    console.error("Database save error:", err.message);
+    req.flash("error", "Failed to add property. Please try again.");
+    return res.redirect("/listings/new");
+  }
 });
 
 const Show = wrapAsync(async (req, res) => {
@@ -96,80 +124,126 @@ const EditGet = wrapAsync(async (req, res) => {
 });
 
 const EditPost = wrapAsync(async (req, res) => {
-    const { id } = req.params;
-    const listingData = req.body.listing || {};
-    const { city, country } = listingData;
+  const { id } = req.params;
+  const listingData = req.body.listing || {};
+  const { city, country } = listingData;
 
-    if (city && country) {
-        const result = await validateCity(city, country);
-
-        if (!result) {
-            if (req.file) {
-                const publicId = req.file.filename || req.file.public_id;
-                if (publicId) {
-                    try {
-                        await cloudinary.uploader.destroy(publicId);
-                    } catch (err) {
-                        console.error("Error deleting Cloudinary image on invalid city:", err);
-                    }
-                }
-            }
-
-            req.flash("error", "Invalid city! Please enter a valid city that exists in the given country.");
-            return res.redirect(`/listings/${id}/edit`);
-        }
-
-        listingData.city = result.normalizedCity;
-        listingData.latitude = parseFloat(result.latitude);
-        listingData.longitude = parseFloat(result.longitude);
-    }
-
-    const listing = await Listing.findById(id);
-    if (!listing) {
-        if (req.file) {
-            const publicId = req.file.filename || req.file.public_id;
-            if (publicId) {
-                try {
-                    await cloudinary.uploader.destroy(publicId);
-                } catch (err) {
-                    console.error("Error deleting Cloudinary image when listing missing:", err);
-                }
-            }
-        }
-        req.flash("error", "item not found!");
-        return res.redirect("/listings");
-    }
-
-    if (listingData.title !== undefined) listing.title = listingData.title;
-    if (listingData.description !== undefined) listing.description = listingData.description;
-    if (listingData.price !== undefined) listing.price = listingData.price;
-    if (listingData.country !== undefined) listing.country = listingData.country;
-    if (listingData.location !== undefined) listing.location = listingData.location;
-    if (listingData.city !== undefined) listing.city = listingData.city;
-    if (listingData.latitude !== undefined) listing.latitude = listingData.latitude;
-    if (listingData.longitude !== undefined) listing.longitude = listingData.longitude;
+  const listing = await Listing.findById(id);
+  if (!listing) {
 
     if (req.file) {
-        if (listing.image && listing.image.filename && listing.image.filename !== "default-image") {
+      const publicId = req.file.filename || req.file.public_id;
+      if (publicId) {
+        try {
+          await cloudinary.uploader.destroy(publicId);
+        } catch (err) {
+          console.error("Error deleting Cloudinary image when listing missing:", err);
+        }
+      }
+    }
+    req.flash("error", "Item not found!");
+    return res.redirect("/listings");
+  }
+
+  
+  if (city && country) {
+    try {
+      const geoResponse = await geocodingClient
+        .forwardGeocode({
+          query: `${city}, ${country}`,
+          limit: 1,
+        })
+        .send();
+
+      const features = geoResponse.body.features || [];
+      const feature = features[0];
+
+      if (!feature || !Array.isArray(feature.center)) {
+      
+        if (req.file) {
+          const publicId = req.file.filename || req.file.public_id;
+          if (publicId) {
             try {
-                await cloudinary.uploader.destroy(listing.image.filename);
+              await cloudinary.uploader.destroy(publicId);
             } catch (err) {
-                console.error("Error deleting old Cloudinary image on edit:", err);
+              console.error("Error deleting Cloudinary image on invalid city:", err);
             }
+          }
         }
 
-        listing.image = {
-            url: req.file.secure_url || req.file.path || req.file.url,
-            filename: req.file.public_id || req.file.filename,
-        };
+        req.flash(
+          "error",
+          "Could not find coordinates for this location. Please enter a valid city."
+        );
+        return res.redirect(`/listings/${id}/edit`);
+      }
+
+      const [lon, lat] = feature.center;
+
+      
+      listingData.latitude = lat;
+      listingData.longitude = lon;
+
+      if (feature.text) {
+        listingData.city = feature.text;
+      }
+    } catch (err) {
+      console.error("Mapbox Geocoding Error (edit):", err.message);
+
+     
+      if (req.file) {
+        const publicId = req.file.filename || req.file.public_id;
+        if (publicId) {
+          try {
+            await cloudinary.uploader.destroy(publicId);
+          } catch (err2) {
+            console.error("Error deleting Cloudinary image on geocoding error:", err2);
+          }
+        }
+      }
+
+      req.flash("error", "Unable to update location. Please try again later.");
+      return res.redirect(`/listings/${id}/edit`);
+    }
+  }
+
+  
+  if (listingData.title !== undefined) listing.title = listingData.title;
+  if (listingData.description !== undefined) listing.description = listingData.description;
+  if (listingData.price !== undefined) listing.price = listingData.price;
+  if (listingData.country !== undefined) listing.country = listingData.country;
+  if (listingData.location !== undefined) listing.location = listingData.location;
+  if (listingData.city !== undefined) listing.city = listingData.city;
+  if (listingData.latitude !== undefined) listing.latitude = listingData.latitude;
+  if (listingData.longitude !== undefined) listing.longitude = listingData.longitude;
+
+  
+  if (req.file) {
+   
+    if (
+      listing.image &&
+      listing.image.filename &&
+      listing.image.filename !== "default-image"
+    ) {
+      try {
+        await cloudinary.uploader.destroy(listing.image.filename);
+      } catch (err) {
+        console.error("Error deleting old Cloudinary image on edit:", err);
+      }
     }
 
-    await listing.save();
+    listing.image = {
+      url: req.file.secure_url || req.file.path || req.file.url,
+      filename: req.file.public_id || req.file.filename,
+    };
+  }
 
-    req.flash("success", "Details updated Successfully!");
-    res.redirect(`/listings/${listing._id}`);
+  
+  await listing.save();
+
+  req.flash("success", "Details updated Successfully!");
+  res.redirect(`/listings/${listing._id}`);
 });
-
 const Destroy = wrapAsync(async (req, res) => {
     const { id } = req.params;
 

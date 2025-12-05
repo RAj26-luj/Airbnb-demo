@@ -59,7 +59,6 @@
       <!-- Current Image -->
       <div class="mb-3">
         <label class="form-label">Current Image:</label><br>
-        <!-- Replaced fixed width with responsive classes -->
         <img src="<%= originalUrl %>"
              class="img-thumbnail img-fluid rounded mt-2"
              style="height: 200px; width: 300px; object-fit: cover;">
@@ -95,52 +94,56 @@
                  name="listing[country]"
                  id="country"
                  value="<%= listing.country %>"
+                 placeholder="e.g. India, France, USA"
+                 autocomplete="off"
                  required>
           <div class="valid-feedback">Looks good!</div>
-          <div class="invalid-feedback">Please provide a valid country.</div>
+          <div class="invalid-feedback">Please provide a valid country first.</div>
         </div>
       </div>
 
-      <!-- City Field -->
-      <div class="mb-3">
+      <!-- City Field (Updated Structure) -->
+      <div class="mb-3 position-relative">
         <label class="form-label" for="city">City:</label>
-        <div class="position-relative">
-          <input class="form-control"
-                 type="text"
-                 name="listing[city]"
-                 id="city"
-                 autocomplete="off"
-                 value="<%= listing.city %>"
-                 required>
+        
+        <input class="form-control"
+               type="text"
+               name="listing[city]"
+               id="city"
+               placeholder="Enter city"
+               autocomplete="off"
+               value="<%= listing.city %>"
+               required>
 
-          <div id="city-suggestions"
-               class="list-group position-absolute w-100"
-               style="z-index:1000;"></div>
+        <!-- Suggestion Dropdown Container -->
+        <div id="city-suggestions" 
+             class="list-group position-absolute w-100 shadow" 
+             style="z-index: 1050; max-height: 200px; overflow-y: auto;">
+        </div>
 
-          <div class="valid-feedback">City looks valid!</div>
-          <div class="invalid-feedback" id="city-invalid-feedback">
-            Please enter a valid city for the selected country.
-          </div>
+        <div class="valid-feedback">City verified!</div>
+        <div class="invalid-feedback" id="city-invalid-feedback">
+          Please enter a valid city for the selected country.
         </div>
       </div>
 
       <!-- Hidden Lat/Lng -->
-      <input type="hidden" name="listing[latitude]" id="latitude" value="<%= listing.latitude %>">
-      <input type="hidden" name="listing[longitude]" id="longitude" value="<%= listing.longitude %>">
+      <input type="hidden" name="listing[latitude]" id="latitude">
+      <input type="hidden" name="listing[longitude]" id="longitude" >
 
       <!-- Location -->
       <div class="mb-3">
-        <label class="form-label" for="location">Location:</label>
+        <label class="form-label" for="location">Specific Location:</label>
         <input class="form-control"
                type="text"
                name="listing[location]"
                id="location"
                value="<%= listing.location %>"
+               placeholder="e.g. Near Central Park"
                required>
         <div class="valid-feedback">Looks good!</div>
         <div class="invalid-feedback">Please provide a valid location.</div>
       </div>
-
 
       
       <div class="d-grid gap-2 d-md-flex justify-content-md-between mb-5">
@@ -152,8 +155,4 @@
   </div>
 </div>
 
-<script src="/js/cityvalidity.js"></script>
-
-<script src="/js/edit.js">
-
-</script>
+<script src="/js/edit.js"></script>

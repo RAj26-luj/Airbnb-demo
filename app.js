@@ -9,6 +9,7 @@ const port=8080;
 const mongoose = require('mongoose');
 const ExpressError = require('./utils/ExpressError.js');  
 const MongoDBURL=process.env.ATLASDB_URL;
+// const MongoDBURL='mongodb://127.0.0.1:27017/airbnb';
 const listingsRouter=require('./routes/listings.js');
 const reviewsRouter=require('./routes/review.js');
 const usersRouter=require('./routes/user.js');

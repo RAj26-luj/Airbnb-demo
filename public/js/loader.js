@@ -1,42 +1,50 @@
 function showLoader() {
-    const loader = document.getElementById('basic-loader');
-    if (!loader) return;
-    loader.style.display = 'flex';
-    loader.style.opacity = '1';
-  }
+  const loader = document.getElementById('basic-loader');
+  if (!loader) return;
 
-  function hideLoader() {
-    const loader = document.getElementById('basic-loader');
-    if (!loader) return;
-    loader.style.transition = 'opacity 0.5s ease';
-    loader.style.opacity = '0';
-    setTimeout(() => {
-      loader.style.display = 'none';
-    }, 500);
-  }
+  loader.style.display = 'flex';
+  loader.style.opacity = '1';
+}
 
-  // Global
-  document.addEventListener('DOMContentLoaded', () => {
-    // Page-load spinner: show ASAP, hide when everything loaded
-    showLoader();
-    window.addEventListener('load', () => {
-      hideLoader();
-    });
+function hideLoader() {
+  const loader = document.getElementById('basic-loader');
+  if (!loader) return;
 
-    // Show loader on normal form submits
-    document.querySelectorAll('form').forEach(form => {
-      form.addEventListener('submit', () => {
-        if (form.classList.contains('needs-validation')) return;
-        showLoader();
-      });
-    });
+  loader.style.transition = 'opacity 0.3s ease';
+  loader.style.opacity = '0';
 
-    // Optional: show on link clicks with data-loader="true"
-    document.querySelectorAll('a[data-loader="true"]').forEach(link => {
-      link.addEventListener('click', (e) => {
-        const href = link.getAttribute('href') || '';
-        if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
-        showLoader();
-      });
+  setTimeout(() => {
+    loader.style.display = 'none';
+  }, 300);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Show loader right away (before content fully loaded)
+  showLoader();
+
+  // Hide when page finished loading
+  window.addEventListener('load', () => {
+    hideLoader();
+  });
+
+  // Show loader on ANY form submit 
+  document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', () => {
+      showLoader();
     });
   });
+
+  // Show loader on links you mark with data-loader="true"
+  document.querySelectorAll('a[data-loader="true"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href') || '';
+      if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+      showLoader();
+    });
+  });
+
+  //  when leaving the page 
+  window.addEventListener('beforeunload', () => {
+    showLoader();
+  });
+});

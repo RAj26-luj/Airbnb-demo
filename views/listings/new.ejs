@@ -1,13 +1,13 @@
 <% layout("layouts/boilerplate") %>
 
 <div class="row mt-3">
-  <!-- Changed to col-12 for mobile, col-md-8 for tablet/desktop -->
   <div class="col-12 col-md-8 offset-md-2">
     <form method="POST"
           action="/listings"
           novalidate
           class="needs-validation"
           enctype="multipart/form-data">
+      
       <h1 class="text-center mb-4" style="color: #fe424d;">Add New Property</h1>
 
       <!-- Title -->
@@ -47,7 +47,7 @@
         <div class="invalid-feedback">Please upload an image of your property.</div>
       </div>
 
-      <!-- Price + Country (Stacks on mobile, Side-by-side on desktop) -->
+      <!-- Price + Country (Country must be filled for city search to work) -->
       <div class="row">
         <div class="mb-3 col-md-4">
           <label class="form-label" for="price">Price:</label>
@@ -67,20 +67,18 @@
                  type="text"
                  name="listing[country]"
                  id="country"
-                 placeholder="Enter country"
+                 placeholder="e.g. India, France, USA"
+                 autocomplete="off"
                  required>
           <div class="valid-feedback">Looks good!</div>
-          <div class="invalid-feedback">Please provide a valid country.</div>
+          <div class="invalid-feedback">Please provide a valid country first.</div>
         </div>
       </div>
 
       <!-- Category -->
       <div class="mb-3">
         <label class="form-label" for="category">Category:</label>
-        <select class="form-select"
-                id="category"
-                name="listing[category]"
-                required>
+        <select class="form-select" id="category" name="listing[category]" required>
           <option value="" disabled selected>Select a category</option>
           <option value="Trending">Trending</option>
           <option value="Rooms">Rooms</option>
@@ -97,42 +95,42 @@
         <div class="invalid-feedback">Please select a category.</div>
       </div>
 
-      <!-- City -->
-      <div class="mb-3">
+      <!-- City (Input with suggestions) -->
+      <div class="mb-3 position-relative">
         <label class="form-label" for="city">City:</label>
-        <div class="position-relative">
-          <input
-            class="form-control"
-            type="text"
-            name="listing[city]"
-            id="city"
-            placeholder="Enter city"
-            autocomplete="off"
-            required
-          >
+        
+        <input class="form-control"
+               type="text"
+               name="listing[city]"
+               id="city"
+               placeholder="Enter city"
+               autocomplete="off"
+               required>
 
-          <div id="city-suggestions"
-               class="list-group position-absolute w-100"
-               style="z-index: 1000;"></div>
+        <!-- Suggestion Dropdown Container -->
+        <div id="city-suggestions" 
+             class="list-group position-absolute w-100 shadow" 
+             style="z-index: 1050; max-height: 200px; overflow-y: auto;">
+        </div>
 
-          <div class="valid-feedback">City looks valid!</div>
-          <div class="invalid-feedback" id="city-invalid-feedback">
-            Please enter a valid city for the selected country.
-          </div>
+        <div class="valid-feedback">City verified!</div>
+        <div class="invalid-feedback" id="city-invalid-feedback">
+          Please enter a valid city for the selected country.
         </div>
       </div>
 
+      <!-- Hidden Lat/Long Fields -->
       <input type="hidden" name="listing[latitude]" id="latitude">
       <input type="hidden" name="listing[longitude]" id="longitude">
 
       <!-- Location -->
       <div class="mb-3">
-        <label class="form-label" for="location">Location:</label>
+        <label class="form-label" for="location">Specific Location:</label>
         <input class="form-control"
                type="text"
                name="listing[location]"
                id="location"
-               placeholder="Enter property location"
+               placeholder="e.g. Near Central Park"
                required>
         <div class="valid-feedback">Looks good!</div>
         <div class="invalid-feedback">Please provide a valid location.</div>
