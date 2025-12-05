@@ -230,20 +230,5 @@ function debounce(fn, delay) {
     });
   
    
-    form.addEventListener("submit", async (e) => {
-     
-      e.preventDefault();
-      e.stopPropagation();
-  
-      const isValid = await validateFinal();
-  
-      if (isValid && form.checkValidity()) {
-       
-        form.removeEventListener("submit", arguments.callee); 
-        form.submit();
-      } else {
-        form.classList.add("was-validated");
-        
-      }
-    });
+   
   });
