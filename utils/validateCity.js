@@ -11,52 +11,74 @@ async function validateCity(city, country) {
   const cleanCityNorm = normalize(cleanCity);
   const cleanCountryNorm = normalize(country);
 
-  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=1&q=${encodeURIComponent(cleanCity + ", " + country)}`;
+  const q = `${cleanCity}, ${country}`;
 
-  const res = await axios.get(url, {
-    headers: {
-      "User-Agent": "YourAppName/1.0", 
-    },
-  });
+  try {
+    const res = await axios.get("https://nominatim.openstreetmap.org/search", {
+      params: {
+        format: "json",
+        limit: 1,
+        addressdetails: 1,
+        q,
+      },
+      headers: {
+        
+        "User-Agent": "airbnb-demo-app/1.0 (your-email@example.com)",
+        "Accept-Language": "en",
+        
+      },
+      timeout: 5000,
+    });
 
-  const data = res.data;
+    const data = res.data;
 
-  if (!Array.isArray(data) || data.length === 0) {
-    return null; 
-  }
+    if (!Array.isArray(data) || data.length === 0) {
+      return null;
+    }
 
-  const place = data[0];
-  const addr = place.address || {};
+    const place = data[0];
+    const addr = place.address || {};
 
-  const rawCity = addr.city || addr.town || addr.village || addr.hamlet || "";
+    const rawCity =
+      addr.city || addr.town || addr.village || addr.hamlet || "";
 
-  if (!rawCity) {
+    if (!rawCity) {
+      return null;
+    }
+
+    const resultCityNorm = normalize(rawCity);
+    const resultCountryNorm = normalize(addr.country || "");
+
+    // City name must match what user sent
+    if (resultCityNorm !== cleanCityNorm) {
+      return null;
+    }
+
+    // Country must also match reasonably
+    if (
+      resultCountryNorm &&
+      cleanCountryNorm &&
+      !resultCountryNorm.includes(cleanCountryNorm) &&
+      !cleanCountryNorm.includes(resultCountryNorm)
+    ) {
+      return null;
+    }
+
+    return {
+      normalizedCity: rawCity,
+      latitude: place.lat,
+      longitude: place.lon,
+    };
+  } catch (err) {
+    // This will catch 403 and any other network/API error
+    console.error("validateCity – geocoding error:", {
+      status: err.response?.status,
+      message: err.message,
+    });
+
+    // Tell the caller "validation failed"
     return null;
   }
-
-  const resultCityNorm = normalize(rawCity);
-  const resultCountryNorm = normalize(addr.country || "");
-
-  // 🔴 City name must match what user sent
-  if (resultCityNorm !== cleanCityNorm) {
-    return null;
-  }
-
-  // 🔴 Country must also match reasonably
-  if (
-    resultCountryNorm &&
-    cleanCountryNorm &&
-    !resultCountryNorm.includes(cleanCountryNorm) &&
-    !cleanCountryNorm.includes(resultCountryNorm)
-  ) {
-    return null;
-  }
-
-  return {
-    normalizedCity: rawCity,
-    latitude: place.lat,
-    longitude: place.lon,
-  };
 }
 
 module.exports = validateCity;
