@@ -22,10 +22,8 @@ async function validateCity(city, country) {
         q,
       },
       headers: {
-        
         "User-Agent": "airbnb-demo-app/1.0 (your-email@example.com)",
         "Accept-Language": "en",
-        
       },
       timeout: 5000,
     });
@@ -49,7 +47,7 @@ async function validateCity(city, country) {
     const resultCityNorm = normalize(rawCity);
     const resultCountryNorm = normalize(addr.country || "");
 
-    // City name must match what user sent
+    // City must match what user sent
     if (resultCityNorm !== cleanCityNorm) {
       return null;
     }
@@ -70,13 +68,20 @@ async function validateCity(city, country) {
       longitude: place.lon,
     };
   } catch (err) {
-    // This will catch 403 and any other network/API error
     console.error("validateCity – geocoding error:", {
       status: err.response?.status,
       message: err.message,
     });
 
-    // Tell the caller "validation failed"
+    
+    if (err.response?.status === 403) {
+      return {
+        normalizedCity: cleanCity,
+        
+      };
+    }
+
+    
     return null;
   }
 }
