@@ -251,8 +251,8 @@
   gap: 2rem;
   overflow-x: auto;
   flex-grow: 1;
-  flex-wrap: nowrap;              /* 🔴 don't allow wrapping */
-  -webkit-overflow-scrolling: touch; /* 🔴 smooth scroll on mobile */
+  flex-wrap: nowrap;             
+  -webkit-overflow-scrolling: touch; 
   padding-bottom: 0.3rem;
 }
 
