@@ -15,11 +15,17 @@ const taxSwitch = document.getElementById("taxSwitchCategory");
     });
   }
   const taxSwitchCategory = document.getElementById("taxSwitchCategory");
- 
+  const taxSwitchMobile = document.getElementById("taxSwitchMobile");
 
+  if(taxSwitchCategory && taxSwitchMobile) {
  
+    taxSwitchMobile.addEventListener("change", () => {
+      taxSwitchCategory.checked = taxSwitchMobile.checked;
+      taxSwitchCategory.dispatchEvent(new Event('click')); 
+    });
     
    
     taxSwitchCategory.addEventListener("change", () => {
       taxSwitchMobile.checked = taxSwitchCategory.checked;
     });
+  }
