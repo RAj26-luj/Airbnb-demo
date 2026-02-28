@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { savereturnTo,isLoggedIn } = require('../middleware.js');
+const { savereturnTo,isLoggedIn } = require('../middlewaree.js');
 const { registerGet, registerPost, loginGet, loginPost, logout, checkAvalibility,checkEmailAvalibility} = require('../controllers/user.js');
 
 // resister routes
